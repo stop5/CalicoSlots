@@ -1,0 +1,4 @@
+{
+    "bet": "Bet {{ amount }}",
+    "done": "Done"
+}

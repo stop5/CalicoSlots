@@ -1,0 +1,29 @@
+repos:
+  - repo: 'https://github.com/pre-commit/pre-commit-hooks'
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+      - id: check-executables-have-shebangs
+      - id: check-json
+      - id: check-toml
+      - id: check-shebang-scripts-are-executable
+        exclude_types:
+          - rust
+      - id: check-symlinks
+      - id: check-vcs-permalinks
+      - id: detect-private-key
+      - id: fix-byte-order-marker
+      - id: forbid-submodules
+      - id: mixed-line-ending
+        args:
+          - --fix=lf
+      - id: trailing-whitespace
+      - id: destroyed-symlinks
+  - repo: 'https://gitea.sebastian-tobie.de/sebastian/pre-commit-standard-files'
+    rev: v0.10
+    hooks:
+      - id: standard-editorconfig
+      - id: tomlq

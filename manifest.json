@@ -1,0 +1,10 @@
+{
+    "Name": "Calico slots extension",
+    "Author": "stop50",
+    "Version": "0.1.0",
+    "Description": "It adds an new button for betting at Calicoslots",
+    "UniqueID": "stop50.calicoslots",
+    "EntryDll": "Calicoslots.dll",
+    "MinimumApiVersion": "4.1.0",
+    "UpdateKeys": []
+  }
