@@ -6,5 +6,8 @@
     "UniqueID": "stop50.calicoslots",
     "EntryDll": "Calicoslots.dll",
     "MinimumApiVersion": "4.1.0",
-    "UpdateKeys": []
+    "UpdateKeys": [
+        "github:stop5/CalicoSlots",
+        "nexus:40103"
+    ]
   }
