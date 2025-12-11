@@ -1,4 +1,5 @@
 {
     "bet": "Wette {{ amount }}",
-    "done": "Fertig"
+    "done": "Fertig",
+    "brokethebank": "{{ name }} hat die Bank gesprengt."
 }

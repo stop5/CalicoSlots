@@ -291,11 +291,16 @@ public class EditedSlots: IMinigame {
 				{
 					Game1.playSound("breathout");
 				}
-				Game1.player.clubCoins += (int)((float)currentBet * payoutModifier);
-				if (payoutModifier == 2500f)
-				{
-					Game1.Multiplayer.globalChatInfoMessage("Jackpot", Game1.player.Name);
-				}
+                var earnings = (int)((float)currentBet * payoutModifier);
+                if (Game1.player.clubCoins >= (int.MaxValue-earnings)) {
+                    Game1.player.clubCoins = int.MaxValue;
+    				Game1.Multiplayer.globalChatInfoMessage(helper.Translation.Get("brokethebank"));
+                } else {
+                    Game1.player.clubCoins += earnings;
+                    if (payoutModifier == 2500f) {
+    					Game1.Multiplayer.globalChatInfoMessage("Jackpot", Game1.player.Name);
+				    }
+                }
 			}
 		}
 		spinButton10.scale =  scale(spinButton10);
