@@ -5,9 +5,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GamePath>/daten/Games/gog/stardew-valley/game</GamePath>
-    <ModFolderName>Calico slots extension</ModFolderName>
+    <ModFolderName>Calico Slots</ModFolderName>
     <EnableHarmony>false</EnableHarmony>
-    <Version>0.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
