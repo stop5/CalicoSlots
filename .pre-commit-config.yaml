@@ -27,3 +27,9 @@ repos:
     hooks:
       - id: standard-editorconfig
       - id: tomlq
+  - repo: local
+    hooks:
+      - id: csharpier
+        name: CSharpier
+        language: dotnet
+        entry: csharpier
