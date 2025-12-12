@@ -513,7 +513,7 @@ public class EditedSlots : IMinigame
         var dx = 441;
         var dy = 385 + 13 * y;
         var height = 13;
-        monitor.Log($"draw button: {dx}, {dy}, {width}, {height}", LogLevel.Info);
+        monitor.Log($"draw button: {dx}, {dy}, {width}, {height}", LogLevel.Debug);
         b.Draw(
             Game1.mouseCursors,
             new Vector2(butt.bounds.X, butt.bounds.Y),
