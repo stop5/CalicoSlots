@@ -8,7 +8,7 @@
         <EnableHarmony>false</EnableHarmony>
     </PropertyGroup>
     <PropertyGroup>
-        <RootNamespace>sebastian</RootNamespace>
+        <RootNamespace>stop50.calicoslots</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

@@ -1,4 +1,4 @@
-namespace sebastian;
+namespace stop50.calicoslots;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
