@@ -111,7 +111,6 @@ public class EditedSlots : IMinigame
     {
         this.helper = helper;
         this.monitor = monitor;
-        var translator = helper.Translation;
         buttons = 0;
         coinBuffer =
             (LocalizedContentManager.CurrentLanguageCode == LocalizedContentManager.LanguageCode.ru)
