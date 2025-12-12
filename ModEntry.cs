@@ -15,6 +15,7 @@ internal sealed class ModEntry : Mod
 {
     public override void Entry(IModHelper helper)
     {
+        I18n.Init(helper.Translation);
         helper.Events.GameLoop.UpdateTicked += minigameoverride;
     }
 
@@ -133,13 +134,13 @@ public class EditedSlots : IMinigame
         Game1.playSound("newArtifact");
         setSlotResults(slots);
 
-        spinButton10 = button(translator.Get("bet", new { amount = Bet.bet10 }));
-        spinButton100 = button(translator.Get("bet", new { amount = Bet.bet100 }));
-        spinButton1000 = button(translator.Get("bet", new { amount = Bet.bet1k }));
-        spinButton10k = button(translator.Get("bet", new { amount = Bet.bet10k }));
-        spinButton100k = button(translator.Get("bet", new { amount = Bet.bet100k }));
-        spinButtonmillion = button(translator.Get("bet", new { amount = Bet.bet1m }));
-        doneButton = button(translator.Get("done"));
+        spinButton10 = button(I18n.Bet(Bet.bet10));
+        spinButton100 = button(I18n.Bet(Bet.bet100));
+        spinButton1000 = button(I18n.Bet(Bet.bet1k));
+        spinButton10k = button(I18n.Bet(Bet.bet10k));
+        spinButton100k = button(I18n.Bet(Bet.bet100k));
+        spinButtonmillion = button(I18n.Bet(Bet.bet1m));
+        doneButton = button(I18n.Done());
         if (Game1.isAnyGamePadButtonBeingPressed())
         {
             Game1.setMousePosition(spinButton10.bounds.Center);

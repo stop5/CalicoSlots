@@ -7,8 +7,12 @@
         <ModFolderName>Calico Slots</ModFolderName>
         <EnableHarmony>false</EnableHarmony>
     </PropertyGroup>
+    <PropertyGroup>
+        <RootNamespace>sebastian</RootNamespace>
+    </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Pathoschild.Stardew.ModTranslationClassBuilder" Version="2.2.1" />
         <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.4.0" />
     </ItemGroup>
 </Project>
