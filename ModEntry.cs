@@ -1,4 +1,4 @@
-namespace stop50.calicoslots;
+namespace Stop50.CalicoSlots;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -13,13 +13,16 @@ using StardewValley.Minigames;
 
 internal sealed class ModEntry : Mod
 {
+    Texture2D? Buttonmap;
+
     public override void Entry(IModHelper helper)
     {
         I18n.Init(helper.Translation);
-        helper.Events.GameLoop.UpdateTicked += minigameoverride;
+        helper.Events.GameLoop.UpdateTicked += MinigameOverride;
+        Buttonmap = helper.ModContent.Load<Texture2D>("assets/Button.png");
     }
 
-    private void minigameoverride(object? sender, UpdateTickedEventArgs e)
+    private void MinigameOverride(object? sender, UpdateTickedEventArgs e)
     {
         if (!Context.IsWorldReady || Game1.currentMinigame == null)
         {
@@ -41,7 +44,9 @@ internal sealed class ModEntry : Mod
     private void override_slots()
     {
         Slots mg = (Slots)Game1.currentMinigame;
-        Game1.currentMinigame = new EditedSlots(Helper, Monitor, mg.currentBet);
+#pragma warning disable CS8604
+        Game1.currentMinigame = new EditedSlots(Helper, Monitor, Buttonmap, mg.currentBet);
+#pragma warning restore CS8604
     }
 }
 
@@ -60,16 +65,16 @@ public class EditedSlots : IMinigame
     public const float slotTurnRate = 0.008f;
     public const int numberOfIcons = 8;
     public const int defaultBet = 10;
-    private string coinBuffer;
-    private List<float> slots;
-    private List<float> slotResults;
-    private ClickableComponent spinButton10;
-    private ClickableComponent spinButton100;
-    private ClickableComponent spinButton1000;
-    private ClickableComponent spinButton10k;
-    private ClickableComponent spinButton100k;
-    private ClickableComponent spinButtonmillion;
-    private ClickableComponent doneButton;
+    private readonly string coinBuffer;
+    private readonly List<float> slots;
+    private readonly List<float> slotResults;
+    private readonly ClickableComponent spinButton10;
+    private readonly ClickableComponent spinButton100;
+    private readonly ClickableComponent spinButton1000;
+    private readonly ClickableComponent spinButton10k;
+    private readonly ClickableComponent spinButton100k;
+    private readonly ClickableComponent spinButtonmillion;
+    private readonly ClickableComponent doneButton;
 
     public bool spinning;
 
@@ -88,29 +93,38 @@ public class EditedSlots : IMinigame
     public ClickableComponent? currentlySnappedComponent;
 
     private int buttons;
-    private IModHelper helper;
-    private IMonitor monitor;
+    private readonly IModHelper helper;
+    private readonly IMonitor monitor;
+    private readonly Texture2D Buttonmap;
+
+    private static readonly int button_shift = 92;
+    private static readonly int margin = 10;
 
     private ClickableComponent button(string text)
     {
-        var length = text.Length * 24;
+        var length = Game1.dialogueFont.MeasureString(text);
+        length.X += 2 * margin + 3;
 
         Vector2 pos = Utility.getTopLeftPositionForCenteringOnScreen(
             Game1.viewport,
-            length,
+            (int)length.X,
             52,
-            text.Length * 12 * ((buttons % 2) == 0 ? -1 : 1),
+            ((buttons % 2) == 0 ? (int)length.X : -button_shift) - button_shift,
             32 + 64 * (buttons / 2)
         );
         monitor.Log($"Position: {pos.X}, {pos.Y}, {length}, 52", LogLevel.Debug);
         buttons++;
-        return new ClickableComponent(new Rectangle((int)pos.X, (int)pos.Y, length, 52), text);
+        return new ClickableComponent(
+            new Rectangle((int)pos.X, (int)pos.Y, (int)length.X, 52),
+            text
+        );
     }
 
-    public EditedSlots(IModHelper helper, IMonitor monitor, int toBet = -1)
+    public EditedSlots(IModHelper helper, IMonitor monitor, Texture2D buttonmap, int toBet = -1)
     {
         this.helper = helper;
         this.monitor = monitor;
+        Buttonmap = buttonmap;
         buttons = 0;
         coinBuffer =
             (LocalizedContentManager.CurrentLanguageCode == LocalizedContentManager.LanguageCode.ru)
@@ -131,14 +145,14 @@ public class EditedSlots : IMinigame
         slots = new List<float> { 0f, 0f, 0f };
         slotResults = new List<float> { 0f, 0f, 0f };
         Game1.playSound("newArtifact");
-        setSlotResults(slots);
+        SetSlotResults(slots);
 
-        spinButton10 = button(I18n.Bet(Bet.bet10));
-        spinButton100 = button(I18n.Bet(Bet.bet100));
-        spinButton1000 = button(I18n.Bet(Bet.bet1k));
-        spinButton10k = button(I18n.Bet(Bet.bet10k));
-        spinButton100k = button(I18n.Bet(Bet.bet100k));
-        spinButtonmillion = button(I18n.Bet(Bet.bet1m));
+        spinButton10 = button(I18n.Bet((int)Bet.bet10));
+        spinButton100 = button(I18n.Bet((int)Bet.bet100));
+        spinButton1000 = button(I18n.Bet((int)Bet.bet1k));
+        spinButton10k = button(I18n.Bet((int)Bet.bet10k));
+        spinButton100k = button(I18n.Bet((int)Bet.bet100k));
+        spinButtonmillion = button(I18n.Bet((int)Bet.bet1m));
         doneButton = button(I18n.Done());
         if (Game1.isAnyGamePadButtonBeingPressed())
         {
@@ -150,50 +164,50 @@ public class EditedSlots : IMinigame
         }
     }
 
-    public void setSlotResults(List<float> toSet)
+    public void SetSlotResults(List<float> toSet)
     {
         double d = Game1.random.NextDouble();
         double modifier =
             1.0 + Game1.player.DailyLuck * 2.0 + (double)Game1.player.LuckLevel * 0.08;
         if (d < 0.001 * modifier)
         {
-            set(toSet, 5);
+            Set(toSet, 5);
             payoutModifier = 2500f;
             return;
         }
         if (d < 0.0016 * modifier)
         {
-            set(toSet, 6);
+            Set(toSet, 6);
             payoutModifier = 1000f;
             return;
         }
         if (d < 0.0025 * modifier)
         {
-            set(toSet, 7);
+            Set(toSet, 7);
             payoutModifier = 500f;
             return;
         }
         if (d < 0.005 * modifier)
         {
-            set(toSet, 4);
+            Set(toSet, 4);
             payoutModifier = 200f;
             return;
         }
         if (d < 0.007 * modifier)
         {
-            set(toSet, 3);
+            Set(toSet, 3);
             payoutModifier = 120f;
             return;
         }
         if (d < 0.01 * modifier)
         {
-            set(toSet, 2);
+            Set(toSet, 2);
             payoutModifier = 80f;
             return;
         }
         if (d < 0.02 * modifier)
         {
-            set(toSet, 1);
+            Set(toSet, 1);
             payoutModifier = 30f;
             return;
         }
@@ -209,7 +223,7 @@ public class EditedSlots : IMinigame
         }
         if (d < 0.2 * modifier)
         {
-            set(toSet, 0);
+            Set(toSet, 0);
             payoutModifier = 5f;
             return;
         }
@@ -237,14 +251,14 @@ public class EditedSlots : IMinigame
         }
     }
 
-    private void set(List<float> toSet, int number)
+    private void Set(List<float> toSet, int number)
     {
         toSet[0] = number;
         toSet[1] = number;
         toSet[2] = number;
     }
 
-    private float scale(ClickableComponent b)
+    private float Scale(ClickableComponent b)
     {
         if (!spinning && b.bounds.Contains(Game1.getOldMouseX(), Game1.getOldMouseY()))
         {
@@ -332,13 +346,13 @@ public class EditedSlots : IMinigame
                 }
             }
         }
-        spinButton10.scale = scale(spinButton10);
-        spinButton100.scale = scale(spinButton100);
-        spinButton1000.scale = scale(spinButton1000);
-        spinButton10k.scale = scale(spinButton10k);
-        spinButton100k.scale = scale(spinButton100k);
-        spinButtonmillion.scale = scale(spinButtonmillion);
-        doneButton.scale = scale(doneButton);
+        spinButton10.scale = Scale(spinButton10);
+        spinButton100.scale = Scale(spinButton100);
+        spinButton1000.scale = Scale(spinButton1000);
+        spinButton10k.scale = Scale(spinButton10k);
+        spinButton100k.scale = Scale(spinButton100k);
+        spinButtonmillion.scale = Scale(spinButtonmillion);
+        doneButton.scale = Scale(doneButton);
         return false;
     }
 
@@ -357,7 +371,7 @@ public class EditedSlots : IMinigame
         if (Game1.player.clubCoins >= 10 && spinButton10.bounds.Contains(x, y))
         {
             Club.timesPlayedSlots++;
-            setSlotResults(slotResults);
+            SetSlotResults(slotResults);
             spinning = true;
             Game1.playSound("bigSelect");
             slotsFinished = 0;
@@ -369,7 +383,7 @@ public class EditedSlots : IMinigame
         if (Game1.player.clubCoins >= (int)Bet.bet100 && spinButton100.bounds.Contains(x, y))
         {
             Club.timesPlayedSlots++;
-            setSlotResults(slotResults);
+            SetSlotResults(slotResults);
             Game1.playSound("bigSelect");
             spinning = true;
             slotsFinished = 0;
@@ -381,7 +395,7 @@ public class EditedSlots : IMinigame
         if (Game1.player.clubCoins >= (int)Bet.bet1k && spinButton1000.bounds.Contains(x, y))
         {
             Club.timesPlayedSlots++;
-            setSlotResults(slotResults);
+            SetSlotResults(slotResults);
             Game1.playSound("bigSelect");
             spinning = true;
             slotsFinished = 0;
@@ -393,7 +407,7 @@ public class EditedSlots : IMinigame
         if (Game1.player.clubCoins >= (int)Bet.bet10k && spinButton10k.bounds.Contains(x, y))
         {
             Club.timesPlayedSlots++;
-            setSlotResults(slotResults);
+            SetSlotResults(slotResults);
             Game1.playSound("bigSelect");
             spinning = true;
             slotsFinished = 0;
@@ -405,7 +419,7 @@ public class EditedSlots : IMinigame
         if (Game1.player.clubCoins >= (int)Bet.bet100k && spinButton100k.bounds.Contains(x, y))
         {
             Club.timesPlayedSlots++;
-            setSlotResults(slotResults);
+            SetSlotResults(slotResults);
             Game1.playSound("bigSelect");
             spinning = true;
             slotsFinished = 0;
@@ -417,7 +431,7 @@ public class EditedSlots : IMinigame
         if (Game1.player.clubCoins >= (int)Bet.bet1m && spinButtonmillion.bounds.Contains(x, y))
         {
             Club.timesPlayedSlots++;
-            setSlotResults(slotResults);
+            SetSlotResults(slotResults);
             Game1.playSound("bigSelect");
             spinning = true;
             slotsFinished = 0;
@@ -508,22 +522,60 @@ public class EditedSlots : IMinigame
         };
     }
 
-    private void drawbutton(SpriteBatch b, ClickableComponent butt, int y, int width, Color color)
+    private static readonly Rectangle button_border = new(0, 0, 3, 13);
+
+    private void drawbutton(SpriteBatch b, ClickableComponent butt, Color color)
     {
-        var dx = 441;
-        var dy = 385 + 13 * y;
-        var height = 13;
-        monitor.Log($"draw button: {dx}, {dy}, {width}, {height}", LogLevel.Debug);
+        var coords = new Vector2(butt.bounds.X, butt.bounds.Y);
         b.Draw(
-            Game1.mouseCursors,
-            new Vector2(butt.bounds.X, butt.bounds.Y),
-            new Rectangle(dx, dy, width, height),
+            Buttonmap,
+            coords,
+            button_border,
             color,
             0f,
             Vector2.Zero,
             4f * butt.scale,
             SpriteEffects.None,
             0.99f
+        );
+        coords.X += 10;
+        int length;
+        while (coords.X < butt.bounds.Right - 3)
+        {
+            length = butt.bounds.Right - (int)coords.X;
+            if (length > 4)
+            {
+                length = 4;
+            }
+            b.Draw(
+                Buttonmap,
+                coords,
+                new Rectangle(3, 0, length, 13),
+                color,
+                0f,
+                Vector2.Zero,
+                4f * butt.scale,
+                SpriteEffects.None,
+                0.99f
+            );
+            coords.X += length;
+        }
+        b.Draw(
+            Buttonmap,
+            coords,
+            button_border,
+            color,
+            0f,
+            Vector2.Zero,
+            4f * butt.scale,
+            SpriteEffects.FlipHorizontally,
+            0.99f
+        );
+        b.DrawString(
+            Game1.dialogueFont,
+            butt.name,
+            new Vector2(butt.bounds.X + margin, butt.bounds.Y + margin),
+            color
         );
     }
 
@@ -640,46 +692,34 @@ public class EditedSlots : IMinigame
         drawbutton(
             b,
             spinButton10,
-            1,
-            31,
             Color.White * ((!spinning && Game1.player.clubCoins >= (int)Bet.bet10) ? 1f : 0.5f)
         );
         drawbutton(
             b,
             spinButton100,
-            1,
-            31,
             Color.White * ((!spinning && Game1.player.clubCoins >= (int)Bet.bet100) ? 1f : 0.5f)
         );
         drawbutton(
             b,
             spinButton1000,
-            1,
-            31,
             Color.White * ((!spinning && Game1.player.clubCoins >= (int)Bet.bet1k) ? 1f : 0.5f)
         );
         drawbutton(
             b,
             spinButton10k,
-            1,
-            31,
             Color.White * ((!spinning && Game1.player.clubCoins >= (int)Bet.bet10k) ? 1f : 0.5f)
         );
         drawbutton(
             b,
             spinButton100k,
-            1,
-            31,
             Color.White * ((!spinning && Game1.player.clubCoins >= (int)Bet.bet100k) ? 1f : 0.5f)
         );
         drawbutton(
             b,
             spinButtonmillion,
-            1,
-            31,
             Color.White * ((!spinning && Game1.player.clubCoins >= (int)Bet.bet1m) ? 1f : 0.5f)
         );
-        drawbutton(b, doneButton, 2, 31, Color.White * ((!spinning) ? 1f : 0.5f));
+        drawbutton(b, doneButton, Color.White * ((!spinning) ? 1f : 0.5f));
         SpriteText.drawStringWithScrollBackground(
             b,
             coinBuffer + Game1.player.clubCoins,
