@@ -109,7 +109,7 @@ public class EditedSlots : IMinigame
             Game1.viewport,
             (int)length.X,
             52,
-            ((buttons % 2) == 0 ? (int)length.X : -button_shift) - button_shift,
+            ((buttons % 2) == 0 ? -button_shift : (int)length.X) - button_shift,
             32 + 64 * (buttons / 2)
         );
         monitor.Log($"Position: {pos.X}, {pos.Y}, {length}, 52", LogLevel.Debug);
